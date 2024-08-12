@@ -511,6 +511,7 @@ struct route* transform_path_into_route(struct array* path_hops, uint64_t destin
       //lnd version
       /* route->total_timelock += FINALTIMELOCK; */
       /* route_hop->timelock = route->total_timelock; */
+      route_hop->arrival_time = current_time;
     }
     else {
       fee = compute_fee(next_route_hop->amount_to_forward, next_edge_policy);
@@ -523,11 +524,13 @@ struct route* transform_path_into_route(struct array* path_hops, uint64_t destin
       //lnd version
       /* route_hop->timelock = route->total_timelock; */
       /* route->total_timelock += next_edge_policy.timelock; */
+      route_hop->arrival_time = current_time + current_edge_policy.timelock;
     }
     route->route_hops = array_insert(route->route_hops, route_hop);
 
     next_edge_policy = current_edge_policy;
     next_route_hop = route_hop;
+    current_time = route_hop->arrival_time;
      }
 
   array_reverse(route->route_hops);
