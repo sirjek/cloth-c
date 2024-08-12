@@ -480,7 +480,7 @@ struct route* route_initialize(long n_hops) {
 
 /* transform a path into a route by computing fees and timelocks required at each hop in the path */
 /* slightly differet w.r.t. `newRoute` in lnd because `newRoute` aims to produce the payloads for each node from the second in the path to the last node */
-struct route* transform_path_into_route(struct array* path_hops, uint64_t destination_amt, struct network* network) {
+struct route* transform_path_into_route(struct array* path_hops, uint64_t destination_amt, struct network* network, uint64_t start_time) {
   struct path_hop *path_hop;
   struct route_hop *route_hop, *next_route_hop;
   struct route *route;
@@ -491,6 +491,7 @@ struct route* transform_path_into_route(struct array* path_hops, uint64_t destin
 
   n_hops = array_len(path_hops);
   route = route_initialize(n_hops);
+  uint64_t current_time = start_time;
 
   for(i=n_hops-1; i>=0; i--) {
     path_hop = array_get(path_hops, i);
@@ -537,3 +538,5 @@ struct route* transform_path_into_route(struct array* path_hops, uint64_t destin
 
   return route;
 }
+
+
