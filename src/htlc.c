@@ -180,7 +180,8 @@ void generate_send_payment_event(struct payment* payment, struct array* path, st
   struct route* route;
   uint64_t next_event_time;
   struct event* send_payment_event;
-  route = transform_path_into_route(path, payment->amount, network);
+  uint64_t start_time = simulation->current_time;
+  route = transform_path_into_route(path, payment->amount, network, start_time);
   payment->route = route;
   next_event_time = simulation->current_time;
   send_payment_event = new_event(next_event_time, SENDPAYMENT, payment->sender, payment );
