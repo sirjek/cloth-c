@@ -444,7 +444,7 @@ void receive_payment(struct event* event, struct simulation* simulation, struct 
         // Write the payment ID, node ID, and time to the file
         fprintf(payment_received_file, "Payment ID: %ld, Middle Node ID: %ld, Received Time: %s\n", 
                 event->payment->id, node->id, asctime(local_time));
-        
+        fflush(payment_received_file);
         fclose(payment_received_file);
     }
 
