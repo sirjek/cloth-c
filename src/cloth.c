@@ -312,6 +312,7 @@ int main(int argc, char *argv[]) {
       exit(-1);
   }
   fprintf(log_file, "Payment ID, Node ID, Received Time\n");
+  fflush(log_file);
   fclose(log_file);
 
   strcpy(output_dir_name, argv[1]);

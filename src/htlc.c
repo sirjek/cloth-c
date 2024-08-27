@@ -431,22 +431,19 @@ void receive_payment(struct event* event, struct simulation* simulation, struct 
     route = payment->route;
     node = array_get(network->nodes, event->node_id);
 
-    // Log time if this node is a middle node (i.e., not the sender or receiver)
-    if (event->node_id != payment->sender && event->node_id != payment->receiver) {
         // Open file to store middle node local time
-        FILE *payment_received_file;
-        payment_received_file = fopen("payment_received_log.csv", "a");
-        if (payment_received_file == NULL) {
-            printf("ERROR: Cannot open payment_received_log.csv\n");
-            exit(-1);
-        }
-
-        // Write the payment ID, node ID, and time to the file
-        fprintf(payment_received_file, "Payment ID: %ld, Middle Node ID: %ld, Received Time: %s\n", 
-                event->payment->id, node->id, asctime(local_time));
-        fflush(payment_received_file);
-        fclose(payment_received_file);
+    FILE *payment_received_file;
+    payment_received_file = fopen("payment_received_log.csv", "a");
+    if (payment_received_file == NULL) {
+        printf("ERROR: Cannot open payment_received_log.csv\n");
+        exit(-1);
     }
+
+    // Write the payment ID, node ID, and time to the file
+    fprintf(payment_received_file, "Payment ID: %ld, Middle Node ID: %ld, Received Time: %s\n", 
+            event->payment->id, node->id, asctime(local_time));
+    fflush(payment_received_file);
+    fclose(payment_received_file);
 
     last_route_hop = array_get(route->route_hops, array_len(route->route_hops) - 1);
     forward_edge = array_get(network->edges, last_route_hop->edge_id);
