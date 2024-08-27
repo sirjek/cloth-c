@@ -411,58 +411,62 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
 
 /* receive a payment (behavior of the payment receiver node) */
 void receive_payment(struct event* event, struct simulation* simulation, struct network* network) {
-  long  prev_node_id;
-  struct route* route;
-  struct payment* payment;
-  struct route_hop* last_route_hop;
-  struct edge* forward_edge,*backward_edge;
-  struct event* next_event;
-  enum event_type event_type;
-  uint64_t next_event_time;
-  struct node* node;
-  /* add local time*/
-  time_t t;
-  struct tm *local_time;
-  time(&t);
-  local_time = localtime(&t);
+    long prev_node_id;
+    struct route* route;
+    struct payment* payment;
+    struct route_hop* last_route_hop;
+    struct edge* forward_edge, *backward_edge;
+    struct event* next_event;
+    enum event_type event_type;
+    uint64_t next_event_time;
+    struct node* node;
 
-  payment = event->payment;
-  route = payment->route;
-  node = array_get(network->nodes, event->node_id);
+    // Add local time logging
+    time_t t;
+    struct tm *local_time;
+    time(&t);
+    local_time = localtime(&t);
 
-  /* file to store middle node local time*/
-  FILE *payment_received_file;
-    payment_received_file = fopen("payment_received_log.csv", "a");
-    if (payment_received_file == NULL) {
-        printf("ERROR: Cannot open payment_received_log.csv\n");
+    payment = event->payment;
+    route = payment->route;
+    node = array_get(network->nodes, event->node_id);
+
+    // Log time if this node is a middle node (i.e., not the sender or receiver)
+    if (event->node_id != payment->sender && event->node_id != payment->receiver) {
+        // Open file to store middle node local time
+        FILE *payment_received_file;
+        payment_received_file = fopen("payment_received_log.csv", "a");
+        if (payment_received_file == NULL) {
+            printf("ERROR: Cannot open payment_received_log.csv\n");
+            exit(-1);
+        }
+
+        // Write the payment ID, node ID, and time to the file
+        fprintf(payment_received_file, "Payment ID: %ld, Middle Node ID: %ld, Received Time: %s\n", 
+                event->payment->id, node->id, asctime(local_time));
+        
+        fclose(payment_received_file);
+    }
+
+    last_route_hop = array_get(route->route_hops, array_len(route->route_hops) - 1);
+    forward_edge = array_get(network->edges, last_route_hop->edge_id);
+    backward_edge = array_get(network->edges, forward_edge->counter_edge_id);
+
+    if (!is_present(backward_edge->id, node->open_edges)) {
+        printf("ERROR (receive_payment): edge %ld is not an edge of node %ld \n", backward_edge->id, node->id);
         exit(-1);
     }
 
-    // Write the payment ID, node ID, and time to the file
-    fprintf(payment_received_file, "Payment ID: %ld, Node ID: %ld, Received Time: %s\n", 
-            event->payment->id, node->id, asctime(local_time));
-    
-    fclose(payment_received_file);
+    backward_edge->balance += last_route_hop->amount_to_forward;
+    payment->is_success = 1;
 
-  last_route_hop = array_get(route->route_hops, array_len(route->route_hops) - 1);
-  forward_edge = array_get(network->edges, last_route_hop->edge_id);
-  backward_edge = array_get(network->edges, forward_edge->counter_edge_id);
-
-  if(!is_present(backward_edge->id, node->open_edges)) {
-    printf("ERROR (receive_payment): edge %ld is not an edge of node %ld \n", backward_edge->id, node->id);
-    exit(-1);
-  }
-
-  backward_edge->balance += last_route_hop->amount_to_forward;
-
-  payment->is_success = 1;
-
-  prev_node_id = last_route_hop->from_node_id;
-  event_type = prev_node_id == payment->sender ? RECEIVESUCCESS : FORWARDSUCCESS;
-  next_event_time = simulation->current_time + 100 + gsl_ran_ugaussian(simulation->random_generator);//channel->latency;
-  next_event = new_event(next_event_time, event_type, prev_node_id, event->payment);
-  simulation->events = heap_insert(simulation->events, next_event, compare_event);
+    prev_node_id = last_route_hop->from_node_id;
+    event_type = prev_node_id == payment->sender ? RECEIVESUCCESS : FORWARDSUCCESS;
+    next_event_time = simulation->current_time + 100 + gsl_ran_ugaussian(simulation->random_generator);
+    next_event = new_event(next_event_time, event_type, prev_node_id, event->payment);
+    simulation->events = heap_insert(simulation->events, next_event, compare_event);
 }
+
 
 /* forward an HTLC success back to the payment sender (behavior of a intermediate hop node in the route) */
 void forward_success(struct event* event, struct simulation* simulation, struct network* network) {
