@@ -305,6 +305,15 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "ERROR cloth.c: please specify the output directory\n");
     return -1;
   }
+
+  FILE *log_file = fopen("middle_node_receipt_log.csv", "w");
+  if (log_file == NULL) {
+      printf("ERROR: Cannot create middle_node_receipt_log.csv\n");
+      exit(-1);
+  }
+  fprintf(log_file, "Payment ID, Node ID, Received Time\n");
+  fclose(log_file);
+
   strcpy(output_dir_name, argv[1]);
 
   read_input(&net_params, &pay_params);
