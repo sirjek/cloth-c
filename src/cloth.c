@@ -48,6 +48,7 @@ void write_output(struct network* network, struct array* payments, char output_d
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "payment_forwarding_log.csv");
   payment_forwarding_log = fopen(output_filename, "w");
+  printf("ERROR: Cannot create payment_forwarding_log.csv\n");
   if (payment_forwarding_log == NULL) {
       printf("ERROR: Cannot create payment_forwarding_log.csv\n");
       exit(-1);
@@ -317,14 +318,14 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  FILE *log_file = fopen("middle_node_receipt_log.csv", "w");
-  if (log_file == NULL) {
-      printf("ERROR: Cannot create middle_node_receipt_log.csv\n");
-      exit(-1);
-  }
-  fprintf(log_file, "Payment ID, Node ID, Received Time\n");
-  fflush(log_file);
-  fclose(log_file);
+  // FILE *log_file = fopen("middle_node_receipt_log.csv", "w");
+  // if (log_file == NULL) {
+  //     printf("ERROR: Cannot create middle_node_receipt_log.csv\n");
+  //     exit(-1);
+  // }
+  // fprintf(log_file, "Payment ID, Node ID, Received Time\n");
+  // fflush(log_file);
+  // fclose(log_file);
 
   strcpy(output_dir_name, argv[1]);
 
