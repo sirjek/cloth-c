@@ -342,15 +342,15 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
   previous_route_hop = get_route_hop(node->id, route->route_hops, 0);
   is_last_hop = next_route_hop->to_node_id == payment->receiver;
 
-  FILE *log_file = fopen("payment_forwarding_log.csv", "a");
-    if (log_file == NULL) {
-        printf("ERROR: Cannot open payment_forwarding_log.csv\n");
-        exit(-1);
-    }
+  // FILE *log_file = fopen("payment_forwarding_log.csv", "a");
+  //   if (log_file == NULL) {
+  //       printf("ERROR: Cannot open payment_forwarding_log.csv\n");
+  //       exit(-1);
+  //   }
 
-  fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Forwarded Time: %s", 
-          event->payment->id, node->id, next_route_hop->to_node_id, asctime(local_time));
-  fclose(log_file);
+  // fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Forwarded Time: %s", 
+  //         event->payment->id, node->id, next_route_hop->to_node_id, asctime(local_time));
+  // fclose(log_file);
 
   if(!is_present(next_route_hop->edge_id, node->open_edges)) {
     printf("ERROR (forward_payment): edge %ld is not an edge of node %ld \n", next_route_hop->edge_id, node->id);
@@ -437,29 +437,11 @@ void receive_payment(struct event* event, struct simulation* simulation, struct 
     uint64_t next_event_time;
     struct node* node;
 
-    // Add local time logging
-    time_t t;
-    struct tm *local_time;
-    time(&t);
-    local_time = localtime(&t);
 
     payment = event->payment;
     route = payment->route;
     node = array_get(network->nodes, event->node_id);
 
-        // Open file to store middle node local time
-    FILE *payment_received_file;
-    payment_received_file = fopen("payment_received_log.csv", "a");
-    if (payment_received_file == NULL) {
-        printf("ERROR: Cannot open payment_received_log.csv\n");
-        exit(-1);
-    }
-
-    // Write the payment ID, node ID, and time to the file
-    fprintf(payment_received_file, "Payment ID: %ld, Middle Node ID: %ld, Received Time: %s\n", 
-            event->payment->id, node->id, asctime(local_time));
-    fflush(payment_received_file);
-    fclose(payment_received_file);
 
     last_route_hop = array_get(route->route_hops, array_len(route->route_hops) - 1);
     forward_edge = array_get(network->edges, last_route_hop->edge_id);

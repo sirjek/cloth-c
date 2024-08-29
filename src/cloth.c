@@ -48,19 +48,16 @@ void write_output(struct network* network, struct array* payments, char output_d
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "payment_forwarding_output.csv");
   csv_next_output = fopen(output_filename, "w");
-  printf("ERROR: Cannot create payment_forwarding_log.csv\n");
   if (csv_next_output == NULL) {
       printf("ERROR: Cannot create payment_forwarding_log.csv\n");
       exit(-1);
   }
   fprintf(csv_next_output, "Payment ID, From Node ID, To Node ID, Forwarded Time\n");
-  fclose(csv_next_output);
 
 
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "channels_output.csv");
   csv_channel_output = fopen(output_filename, "w");
-  printf("ERROR: Cannot create payment_forwarding_test.csv\n");
   if(csv_channel_output  == NULL) {
     printf("ERROR cannot open channel_output.csv\n");
     exit(-1);
@@ -113,8 +110,19 @@ void write_output(struct network* network, struct array* payments, char output_d
       fprintf(csv_payment_output, "%ld",route->total_fee);
     }
     fprintf(csv_payment_output,"\n");
+
+
+    for(j=0; j<array_len(hops); j++) {
+      hop = array_get(hops, j);
+      if (j > 0) { 
+        struct route_hop* prev_hop = array_get(hops, j-1);
+        fprintf(csv_next_output, "%ld,%ld,%ld,%ld\n", payment->id, prev_hop->to_node_id, hop->to_node_id, payment->start_time + j * 100);
+      }
+    }
   }
   fclose(csv_payment_output);
+
+  fclose(csv_next_output);
 
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "nodes_output.csv");
@@ -318,15 +326,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "ERROR cloth.c: please specify the output directory\n");
     return -1;
   }
-
-  // FILE *log_file = fopen("middle_node_receipt_log.csv", "w");
-  // if (log_file == NULL) {
-  //     printf("ERROR: Cannot create middle_node_receipt_log.csv\n");
-  //     exit(-1);
-  // }
-  // fprintf(log_file, "Payment ID, Node ID, Received Time\n");
-  // fflush(log_file);
-  // fclose(log_file);
 
   strcpy(output_dir_name, argv[1]);
 
