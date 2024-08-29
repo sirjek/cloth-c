@@ -342,15 +342,19 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
   previous_route_hop = get_route_hop(node->id, route->route_hops, 0);
   is_last_hop = next_route_hop->to_node_id == payment->receiver;
 
-  // FILE *log_file = fopen("payment_forwarding_log.csv", "a");
-  //   if (log_file == NULL) {
-  //       printf("ERROR: Cannot open payment_forwarding_log.csv\n");
-  //       exit(-1);
-  //   }
+  if (previous_route_hop->from_node_id == payment->sender) {
+        // Open log file
+        FILE *log_file = fopen("payment_forwarding_log.csv", "a");
+        if (log_file == NULL) {
+            printf("ERROR: Cannot open payment_forwarding_log.csv\n");
+            exit(-1);
+        }
 
-  // fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Forwarded Time: %s", 
-  //         event->payment->id, node->id, next_route_hop->to_node_id, asctime(local_time));
-  // fclose(log_file);
+        // Log the payment ID, sender node ID, next node ID, and the simulation time
+        fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Simulated Time: %lu", 
+                event->payment->id, payment->sender, next_route_hop->to_node_id, simulation->current_time);
+        fclose(log_file);
+    }
 
   if(!is_present(next_route_hop->edge_id, node->open_edges)) {
     printf("ERROR (forward_payment): edge %ld is not an edge of node %ld \n", next_route_hop->edge_id, node->id);
