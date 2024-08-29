@@ -329,12 +329,28 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
   unsigned int is_last_hop, can_send_htlc;
   struct edge *next_edge = NULL, *prev_edge;
 
+  // Add local time logging
+  time_t t;
+  struct tm *local_time;
+  time(&t);
+  local_time = localtime(&t);
+
   payment = event->payment;
   node = array_get(network->nodes, event->node_id);
   route = payment->route;
   next_route_hop=get_route_hop(node->id, route->route_hops, 1);
   previous_route_hop = get_route_hop(node->id, route->route_hops, 0);
   is_last_hop = next_route_hop->to_node_id == payment->receiver;
+
+  FILE *log_file = fopen("payment_forwarding_log.csv", "a");
+    if (log_file == NULL) {
+        printf("ERROR: Cannot open payment_forwarding_log.csv\n");
+        exit(-1);
+    }
+
+  fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Forwarded Time: %s", 
+          event->payment->id, node->id, next_route_hop->to_node_id, asctime(local_time));
+  fclose(log_file);
 
   if(!is_present(next_route_hop->edge_id, node->open_edges)) {
     printf("ERROR (forward_payment): edge %ld is not an edge of node %ld \n", next_route_hop->edge_id, node->id);
