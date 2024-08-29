@@ -355,7 +355,7 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
         }
 
         fprintf(log_file, "%ld,%ld,%ld,%lu\n", 
-                event->payment->id, payment->sender, next_route_hop->to_node_id, simulation->current_time);
+                event->payment->id, payment->sender, previous_route_hop->to_node_id, simulation->current_time);
         fclose(log_file);
     }
 
