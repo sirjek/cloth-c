@@ -44,6 +44,17 @@ void write_output(struct network* network, struct array* payments, char output_d
     printf("cloth.c: Cannot find the output directory. The output will be stored in the current directory.\n");
     strcpy(output_dir_name, "./");
   }
+  
+  strcpy(output_filename, output_dir_name);
+  strcat(output_filename, "payment_forwarding_log.csv");
+  payment_forwarding_log = fopen(output_filename, "w");
+  if (payment_forwarding_log == NULL) {
+      printf("ERROR: Cannot create payment_forwarding_log.csv\n");
+      exit(-1);
+  }
+  fprintf(payment_forwarding_log, "Payment ID, From Node ID, To Node ID, Forwarded Time\n");
+  fclose(payment_forwarding_log);
+
 
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "channels_output.csv");
