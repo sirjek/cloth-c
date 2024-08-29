@@ -27,7 +27,7 @@
 
 /* write the final values of nodes, channels, edges and payments in csv files */
 void write_output(struct network* network, struct array* payments, char output_dir_name[]) {
-  FILE* csv_channel_output, *csv_edge_output, *csv_payment_output, *csv_node_output;
+  FILE* csv_channel_output, *csv_edge_output, *csv_payment_output, *csv_node_output, *payment_forwarding_log;
   long i,j, *id;
   struct channel* channel;
   struct edge* edge;
