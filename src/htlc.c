@@ -343,15 +343,14 @@ void forward_payment(struct event *event, struct simulation* simulation, struct 
   is_last_hop = next_route_hop->to_node_id == payment->receiver;
 
   if (previous_route_hop->from_node_id == payment->sender) {
-        // Open log file
+
         FILE *log_file = fopen("payment_forwarding_log.csv", "a");
         if (log_file == NULL) {
             printf("ERROR: Cannot open payment_forwarding_log.csv\n");
             exit(-1);
         }
 
-        // Log the payment ID, sender node ID, next node ID, and the simulation time
-        fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Simulated Time: %lu", 
+        fprintf(log_file, "Payment ID: %ld, From Node ID: %ld, To Node ID: %ld, Simulated Time: %lu\n", 
                 event->payment->id, payment->sender, next_route_hop->to_node_id, simulation->current_time);
         fclose(log_file);
     }
