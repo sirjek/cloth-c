@@ -27,7 +27,7 @@
 
 /* write the final values of nodes, channels, edges and payments in csv files */
 void write_output(struct network* network, struct array* payments, char output_dir_name[]) {
-  FILE* csv_channel_output, *csv_edge_output, *csv_payment_output, *csv_node_output, *payment_forwarding_log;
+  FILE* csv_next_output, *csv_channel_output, *csv_edge_output, *csv_payment_output, *csv_node_output;
   long i,j, *id;
   struct channel* channel;
   struct edge* edge;
@@ -46,20 +46,21 @@ void write_output(struct network* network, struct array* payments, char output_d
   }
   
   strcpy(output_filename, output_dir_name);
-  strcat(output_filename, "payment_forwarding_log.csv");
-  payment_forwarding_log = fopen(output_filename, "w");
+  strcat(output_filename, "payment_forwarding_output.csv");
+  csv_next_output = fopen(output_filename, "w");
   printf("ERROR: Cannot create payment_forwarding_log.csv\n");
-  if (payment_forwarding_log == NULL) {
+  if (csv_next_output == NULL) {
       printf("ERROR: Cannot create payment_forwarding_log.csv\n");
       exit(-1);
   }
-  fprintf(payment_forwarding_log, "Payment ID, From Node ID, To Node ID, Forwarded Time\n");
-  fclose(payment_forwarding_log);
+  fprintf(csv_next_output, "Payment ID, From Node ID, To Node ID, Forwarded Time\n");
+  fclose(csv_next_output);
 
 
   strcpy(output_filename, output_dir_name);
   strcat(output_filename, "channels_output.csv");
   csv_channel_output = fopen(output_filename, "w");
+  printf("ERROR: Cannot create payment_forwarding_test.csv\n");
   if(csv_channel_output  == NULL) {
     printf("ERROR cannot open channel_output.csv\n");
     exit(-1);
